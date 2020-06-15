@@ -60,68 +60,21 @@
 
 \newcommand{\formatproblempartname}[1]{\fbox{\textbf{(#1)}} \quad}
 
-%\readlist\problempartlist{\defaultppartlist}
-
-%% The \NewDocumentEnvironment macro is defined in the xparse package.
-%% I use it here because it provides simple, easy-to-use support for multiple configurable
-%% option arguments.
-
-%% Definition of the "problem" environment.
-%% Options: 
-%% 1. Problem title (optional arg; defaults to "Problem <problemnum>"
-%% 2. Problem subtitle (optional; defaults to empty
-\NewDocumentEnvironment{problem}{ o o }
-{
-	\refstepcounter{problem}				%% Increments "problem" counter
-	\setcounter{problemstart}{\thepage}		%% Initializes problemstart page counter
-	\setcounter{problempart}{0}				%% Initializes "problempart" numerical counter
-	\IfNoValueTF{#1}						%% Set title based on 1st optional arg
-		{\renewcommand{\theproblemtitle}{Problem \theproblem}}
-		{\renewcommand{\theproblemtitle}{#1}}	
-	\IfNoValueTF{#2}						%% Set subtitle based on 2nd optional arg
-		{
-			\renewcommand{\theproblemsubtitle}{}
-			\renewcommand{\theproblemformattedtitle}{\textbf{\theproblemtitle}}%
-		}
-		{
-			\renewcommand{\theproblemsubtitle}{#2}
-			\renewcommand{\theproblemformattedtitle}{\textbf{\theproblemtitle} (\theproblemsubtitle)}
-		}	
-	\renewcommand{\theproblemheadertext}{\theproblemtitle \, -- \, \theproblempage}
-	
-%	\protected@edef\@currentlabelname{\theproblemtitle}
-%% Not sure what this line was supposed to accomplish
-
-	%% Format problem "title bar"
-	\noindent \hrule height .5pt width \textwidth
-	\vskip .75em
-	\begin{center}
-		\large{\theproblemformattedtitle}
-	\end{center}
-	\noindent \hrule height .5pt width \textwidth
-	\vskip .75em
-}{	\newpage }
-
+%% Hacky implementation of "switch" statement
 \newcommand{\ifequals}[3]{\ifthenelse{\equal{#1}{#2}}{#3}{}}
 \newcommand{\case}[2]{#1 #2} % Dummy, so \renewcommand has something to overwrite...
 \newenvironment{switch}[1]{\renewcommand{\case}{\ifequals{#1}}}{}
 
+%% Formats problem part name based on "format key"
 \newcommand{\getppartname}[1]
-{
-	\begin{switch}{#1}
-		\case{a}{\alph{problempart}}
-		\case{A}{\Alph{problempart}}
-		\case{i}{\roman{problempart}}
-		\case{I}{\Roman{problempart}}
-		\case{1}{\arabic{problempart}}
-	\end{switch}
-}
+{\begin{switch}{#1}\case{a}{\alph{problempart}}\case{A}{\Alph{problempart}}\case{i}{\roman{problempart}}\case{I}{\Roman{problempart}}\case{1}{\arabic{problempart}}\end{switch}}
 
-\NewDocumentEnvironment{problemprime}{ o o O{a} e{^} }
+
+\NewDocumentEnvironment{problem}{ o o O{a} e{^} }
 {
 	\refstepcounter{problem}				%% Increments "problem" counter
 	\setcounter{problemstart}{\thepage}		%% Initializes problemstart page counter
-	\setcounter{problempart}{-1}				%% Initializes "problempart" numerical counter
+	\setcounter{problempart}{0}				%% Initializes "problempart" numerical counter
 	\IfNoValueTF{#4}
 		{
 			\renewcommand{\usecustomppartlist}{\BooleanFalse}
@@ -158,28 +111,16 @@
 	\vskip .75em
 }{	\newpage }
 
-\NewDocumentCommand{\problempartprime}{}
+\NewDocumentCommand{\problempart}{}
 {
 	\refstepcounter{problempart}
 	\IfBooleanTF{\usecustomppartlist}
 		{
-			\renewcommand{\theproblempartname}{\problempartlist[\intcalcMod{\theproblempart}{\problempartlistlen} + 1]}		
+			\renewcommand{\theproblempartname}{\problempartlist[\intcalcMod{\value{problempart} - 1}{\problempartlistlen} + 1]}		
 		}
 		{
 			\renewcommand{\theproblempartname}{\getppartname{\problempartformatkey}}
 		}
-%	\IfNoValueTF{#3}
-%		{\renewcommand{\theproblempartformattedname}{\theproblempartname} }
-%		{\renewcommand{\theproblempartformattedname}{\theproblempartname~.}}
-%	\IfNoValueTF{#1}
-%		{ }
-%		{\renewcommand{\theproblempartformattedname}{(\theproblempartformattedname)}}
-%	\IfNoValueTF{#2}
-%		{ }
-%		{\renewcommand{\theproblempartformattedname}{\textbf{\theproblempartformattedname}}}
-%	\IfNoValueTF{#4}
-%		{ }
-%		{\renewcommand{\theproblempartformattedname}{\fbox{\theproblempartformattedname}	}}	
 	\vskip .75em \par
 	\formatproblempartname{\theproblempartname}
 }
@@ -193,28 +134,6 @@
 {
 	\begin{mdframed}[backgroundcolor=#3, frametitle={#1}]#2
 }{	\end{mdframed}}
-
-%% DEPRECATED %%
-\NewDocumentEnvironment{problempartsimple}{ o }
-{
-	\refstepcounter{problempart}
-	\IfNoValueTF{#1}%
-		{\renewcommand{\theproblempartname}{(\alph{problempart})}	}%
-		{\renewcommand{\theproblempartname}{#1}	}
-	\renewcommand{\theproblempartformattedname}{\fbox{\large{\textbf{\theproblempartname}}}}
-	\vspace{1em}
-	\theproblempartformattedname \quad
-}
-
-\NewDocumentEnvironment{problempartsimple*}{ o }
-{
-	\refstepcounter{problempart}
-	\IfNoValueTF{#1}%
-		{\renewcommand{\theproblempartname}{(\alph{\theproblempart})}	}%
-		{\renewcommand{\theproblempartname}{#1}	}
-	\renewcommand{\theproblempartformattedname}{\large{\textbf{\theproblempartname}}}
-	\theproblempartformattedname \quad
-}
 
 \makeatother
 
