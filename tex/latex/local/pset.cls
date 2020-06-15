@@ -19,6 +19,7 @@
 \RequirePackage{amsmath}
 \RequirePackage{mathtools}
 
+
 %% Not sure yet what to do about the "geometry" setters below
 %\setlength{\textwidth}{\paperwidth}
 %\addtolength{\textwidth}{-2in}
@@ -56,6 +57,8 @@
 \newcommand{\defaultppartlist}{
 	a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z
 }
+
+\newcommand{\formatproblempartname}[1]{\fbox{\textbf{(#1)}} \quad}
 
 %\readlist\problempartlist{\defaultppartlist}
 
@@ -118,7 +121,7 @@
 {
 	\refstepcounter{problem}				%% Increments "problem" counter
 	\setcounter{problemstart}{\thepage}		%% Initializes problemstart page counter
-	\setcounter{problempart}{0}				%% Initializes "problempart" numerical counter
+	\setcounter{problempart}{-1}				%% Initializes "problempart" numerical counter
 	\IfNoValueTF{#4}
 		{
 			\renewcommand{\usecustomppartlist}{\BooleanFalse}
@@ -155,29 +158,30 @@
 	\vskip .75em
 }{	\newpage }
 
-\NewDocumentCommand{\problempartprime}{ tp tb t. t| }
+\NewDocumentCommand{\problempartprime}{}
 {
 	\refstepcounter{problempart}
 	\IfBooleanTF{\usecustomppartlist}
 		{
-			\renewcommand{\theproblempartname}{\problempartlist[\intcalcMod{\theproblempart}{\problempartlistlen} + 1]	}		
+			\renewcommand{\theproblempartname}{\problempartlist[\intcalcMod{\theproblempart}{\problempartlistlen} + 1]}		
 		}
 		{
 			\renewcommand{\theproblempartname}{\getppartname{\problempartformatkey}}
 		}
-	\IfBooleanTF{#3}
-		{\renewcommand{\theproblempartformattedname}{\theproblempartname~.}}
-		{\renewcommand{\theproblempartformattedname}{\theproblempartname} }
-	\IfBooleanTF{#1}
-		{\renewcommand{\theproblempartformattedname}{(\theproblempartformattedname)}}
-		{ }
-	\IfBooleanTF{#2}
-		{\renewcommand{\theproblempartformattedname}{\textbf{\theproblempartformattedname}}}
-		{ }
-	\IfBooleanTF{#4}
-		{\renewcommand{\theproblempartformattedname}{\fbox{\theproblempartformattedname}	}}
-		{ }		
-	\theproblempartformattedname
+%	\IfNoValueTF{#3}
+%		{\renewcommand{\theproblempartformattedname}{\theproblempartname} }
+%		{\renewcommand{\theproblempartformattedname}{\theproblempartname~.}}
+%	\IfNoValueTF{#1}
+%		{ }
+%		{\renewcommand{\theproblempartformattedname}{(\theproblempartformattedname)}}
+%	\IfNoValueTF{#2}
+%		{ }
+%		{\renewcommand{\theproblempartformattedname}{\textbf{\theproblempartformattedname}}}
+%	\IfNoValueTF{#4}
+%		{ }
+%		{\renewcommand{\theproblempartformattedname}{\fbox{\theproblempartformattedname}	}}	
+	\vskip .75em \par
+	\formatproblempartname{\theproblempartname}
 }
 
 %% Definition of the "problemstatement" environment.
@@ -190,31 +194,7 @@
 	\begin{mdframed}[backgroundcolor=#3, frametitle={#1}]#2
 }{	\end{mdframed}}
 
-
-%% Definition of the "problempart" environment.
-%% Options:
-%% 1. Problem part name (optional; defaults to Latin lower-case letter corresponding to problempart number)
-%% 2. Boolean triggered by the presence of the token "p" in the argument list.  Indicates whether to include parentheses around the problempart name.
-%% 3. Boolean triggered by the presence of the token "b" in the argument list.  Indicates whether to "box" the problempart name.
-\NewDocumentEnvironment{problempart}{ o tp tb }
-{
-	\refstepcounter{problempart}
-	\IfNoValueTF{#1}
-		{\renewcommand{\theproblempartname}{\alph{\theproblempart}}	}%
-		{\renewcommand{\theproblempartname}{#1}	}
-	\IfBooleanTF{#2}
-		{\renewcommand{\theproblempartformattedname}{\textbf{(\theproblempartname)}}}
-		{\renewcommand{\theproblempartformattedname}{\textbf{\theproblempartname}}	}%
-	\IfBooleanTF{#3}
-		{\renewcommand{\theproblempartformattedname}{\fbox{(\theproblempartformattedname)}	}}
-		{ }
-	\theproblempartformattedname
-}{}
-
-\providecommand{\problempartautorefname}{Part}
-	%% The purpose of this command is to make sure problem parts are referenced correctly
-	%% by autoref calls, e.g., \ref{part_a} results in "Part (a)" instead of "a".
-
+%% DEPRECATED %%
 \NewDocumentEnvironment{problempartsimple}{ o }
 {
 	\refstepcounter{problempart}
@@ -235,10 +215,17 @@
 	\renewcommand{\theproblempartformattedname}{\large{\textbf{\theproblempartname}}}
 	\theproblempartformattedname \quad
 }
+
 \makeatother
 
 \newcommand{\headertitle}[1]{\renewcommand{\theheadertitle}{#1}}
 \numberwithin{equation}{problem}
+
+%% Autoref stuff
+\providecommand{\includegraphicsautorefname}{Figure}
+\providecommand{\figureautorefname}{Figure}
+\providecommand{\problemautorefname}{Problem}
+\providecommand{\problempartautorefname}{Part}
 
 %% Describe layout of title
 \pretitle{
@@ -277,3 +264,20 @@
 \setlength{\footskip}{30pt}
 \renewcommand{\footrulewidth}{.4pt}
 \renewcommand{\footrule}{\hrule height \footrulewidth width \textwidth}
+
+%% Theorem environments
+\newtheorem{theorem}{Theorem}[problem]
+\providecommand{\theoremautorefname}{Theorem}
+\newtheorem{proposition}{Proposition}[problem]
+\providecommand{\propositionautorefname}{Proposition}
+\newtheorem{corollary}{Corollary}[proposition]
+\providecommand{\corollaryautorefname}{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[problem]
+\providecommand{\definitionautorefname}{Definition}
+\newtheorem{example}{Example}[problem]
+\providecommand{\exampleautorefname}{Example}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}[problem]
+\providecommand{\remarkautorefname}{Remark}
+\newtheorem*{note}{Note}
