@@ -1,6 +1,6 @@
 %% TODO: Write .dtx documentation file
 
-\NeedsTeXFormat{LaTeX2e}			%% Some expl3 macros are used...(?)
+\NeedsTeXFormat{LaTeX2e}			%% Some expl3 macros are used, but are imported through packages
 \ProvidesClass{pset}[2020/06/15 Template for physics problem sets.]
 
 %% Most of the time, this package will be used with include.sty, so some of these
